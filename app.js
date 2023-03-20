@@ -3,6 +3,7 @@ const startBtn = document.querySelector('#start'),
     timeList = document.querySelector('#time-list'),
     timeEl = document.querySelector('#time'),
     board= document.querySelector('#board');
+    
 
 let time = 0;
 
@@ -10,8 +11,8 @@ const dataLevel = {
     lvl1: {
         row: 8,
         column:8,
-        bomb:15,
-        seconds:999,
+        bomb:4,
+        seconds:180,
     },
     lvl2: {
         row: 10,
@@ -51,18 +52,19 @@ timeList.addEventListener('click',(event)=> {
 
 function startGame (level) {  
     clear = setInterval(decreaseTime, 1000)
-    board.innerHTML = ' ';
     const numberOfCells = level.row*level.column;
     board.style.width = `${Math.sqrt(numberOfCells)*40}px`;
     const cells = `btn,`.repeat(numberOfCells).split(',');
     cells.splice(cells.length - 1);
     const numberArr =[]
 
+
     randomBomb (level, numberOfCells, cells);
     getCount (level, cells, numberArr)
 
-
     createBlock(cells, numberArr);
+
+    console.log(cells)
 
     openCell()
     detectBomb () 
@@ -88,6 +90,7 @@ function timeOver () {
     },3000)
     
 }
+
 
 function createBlock(cells, numberArr) {
     cells.forEach((item, index)=> {
@@ -149,15 +152,30 @@ function openCell() {
                 e.target.classList.add('btn_open')
                 e.target.disabled = true;
             }  
-            isBomb(e)
-           const cellsIndex = [...board.children]
-           const index = cellsIndex.indexOf(e.target)
+        if (e.target.classList.contains('flag')) {
+            e.target.classList.remove('flag')
+        }
+            isBomb(e);
 
+        //    console.log(e.target.innerHTML==' ')
+        //     console.log(board)
+        //    console.log(cellsIndex[index].innerHTML)
+        const cellsIndex = [...board.children]
+        const index = cellsIndex.indexOf(e.target)
 
+        // const btn = document.querySelectorAll('.btn');
+        // const row = Math.sqrt(btn.length)
+    
+        //         console.log(btn[index].classList.contains('bomb'))
+
+        isEmptyLine (board, index);
 
         })
 
+        
+
 }
+
 
 function detectBomb () {
     board.addEventListener('contextmenu', (e) => { 
@@ -170,47 +188,72 @@ function detectBomb () {
 
 function isBomb(e) {
     if (e.target.classList.contains('bomb')) {
-        board.style.display = 'none';
-        alert('You Lose')
+        setTimeout(()=> {
+            alert('You Lose')
+            board.style.display = 'none';
+        },1000)
+        
       setTimeout(()=> {
         location.reload();
-    },1000)
+    },2000)
     }  
 }
 
 
-function isEmptyLine (cellsIndex, index) {
-    
+function isEmptyLine (board, index) {
+
+    const btn = document.querySelectorAll('.btn');
+    const row = Math.sqrt(btn.length)
+
+    if (btn[index].innerHTML==' ' && !btn[index].classList.contains('bomb')) {
+    }
+
+
+    for (let i =1; i<=row; i++) {
+        if (btn[index].innerHTML==' ' && !btn[index].classList.contains('bomb')) {
+                    if ( btn[index-i] && btn[index-i].innerHTML==' ' && !btn[index-i].classList.contains('bomb') && !btn[index-i].classList.contains('btn_open')) {
+                        btn[index-i].classList.add('btn_open')
+                        btn[index-i].disabled = true;
+                    } else if (btn[index-i] && btn[index-i].innerHTML !==' ') {
+                        btn[index-i].classList.add('btn_open')
+                        btn[index-i].disabled = true;
+                        continue;
+
+                    } 
+                    if (btn[index+i] && btn[index+1].innerHTML==' ' && !btn[index+i].classList.contains('bomb') && !btn[index+i].classList.contains('btn_open')) {
+                        btn[index+i].classList.add('btn_open')
+                        btn[index+i].disabled = true;
+                        //isEmptyLine (board, index+1)
+                    }  else if (btn[index+i] && btn[index+i].innerHTML !==' ') {
+                        btn[index+i].classList.add('btn_open')
+                        btn[index+i].disabled = true;
+                        continue;
+                    }
+                    if (btn[index-row-i] && btn[index-row-i].innerHTML==' ' && !btn[index-row-i].classList.contains('bomb') && !btn[index-row-i].classList.contains('btn_open')) {
+                        btn[index-row-i].classList.add('btn_open')
+                        btn[index-row-i].disabled = true;
+            
+                    } else if (btn[index-row-i] && btn[index-row-i].innerHTML !==' ') {
+                        btn[index-row-i].classList.add('btn_open')
+                        btn[index-row-i].disabled = true;
+                        continue;
+                    }
+                    if (btn[index+row+i] && btn[index+row+i].innerHTML==' ' && !btn[index+row+i].classList.contains('bomb') && !btn[index+row+i].classList.contains('btn_open')) {
+                        btn[index+row+i].classList.add('btn_open')
+                        btn[index+row+i].disabled = true;
+                        //isEmptyLine (board, index+row)
+                     } else if (btn[index+row+i] && btn[index+row+i].innerHTML !==' ') {
+                        btn[index+row+i].classList.add('btn_open')
+                        btn[index+row+i].disabled = true;
+                        continue;
+                    }
+        } 
+    } 
+
+           console.log(btn[index].innerHTML)
+
+        console.log(e.target.innerHTML==' ')
+        console.log(board)
+       console.log(cellsIndex[index].innerHTML)
 
 }
-
-
-
-
-
-
-
-
-
-
-
-// function finishGame (e) {
-//     if (time === 0)    {
-//         console.log('Time is up and you lost')
-//     } else if (e.target.classList.contains('bomb')) {
-//         console.log('BOMB you lost')
-//     }
-// }
-
-// function getCount (cells) {
-//     let count = 0;
-//     for(let x=-1; x<=1;x++) {
-//         for(let y=-1; y<=1;y++) {
-//             if(cells[level.row+x + level.column+y]){
-//                 console.log(cells[(level.row+x)*+ level.column+y])
-//                 count++
-//             }
-//         }
-//     }
-
-// }
