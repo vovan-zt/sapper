@@ -53,20 +53,19 @@ function startGame(level) {
 	board.innerHTML = `<button class = 'btn'></button>`.repeat(numberOfCells);
 	board.style.width = `${Math.sqrt(numberOfCells) * 40}px`;
 	const cells = [...board.children];
-    const bombs = []
+	const bombs = [];
 
 	let countCells = 0;
 
-    
-    function randomBomb () {
-        for (let i=0; i<level.bomb; i++) {
-            let bomb= Math.floor(Math.random() * numberOfCells)
-            bombs.includes(bomb)?i--:bombs.push(bomb)
-        }
-        return bombs
-    }
+	function randomBomb() {
+		for (let i = 0; i < level.bomb; i++) {
+			let bomb = Math.floor(Math.random() * numberOfCells);
+			bombs.includes(bomb) ? i-- : bombs.push(bomb);
+		}
+		return bombs;
+	}
 
-    randomBomb ();
+	randomBomb();
 
 	function decreaseTime() {
 		timeEl.innerHTML = `Time ${time}s`;
@@ -107,15 +106,13 @@ function startGame(level) {
 
 		const index = cells.indexOf(e.target);
 
-		console.log(index);
-
 		const column = index % level.column;
 		const row = Math.floor(index / level.row);
 
 		openCell(row, column);
 	});
 
-	function isValid(row, column) {
+	function isDataValid(row, column) {
 		return row >= 0 && row < level.row && column >= 0 && column < level.column;
 	}
 
@@ -132,7 +129,7 @@ function startGame(level) {
 	}
 
 	function openCell(row, column) {
-		if (!isValid(row, column)) return;
+		if (!isDataValid(row, column)) return;
 		const index = row * level.row + column;
 
 		const cell = cells[index];
@@ -143,6 +140,22 @@ function startGame(level) {
 		if (isBomb(row, column)) {
 			cell.classList.add("bomb");
 			alert("You Lose");
+            cells.forEach((item, ind) => {
+                if(!item.classList.contains('btn_open') && bombs.includes(ind)) {
+                    item.classList.add('btn_open');
+                    item.classList.add('bomb');
+                    item.disabled = true;
+                } else if (!item.classList.contains('btn_open')) {
+                    item.classList.add('btn_open');
+                    item.disabled = true;
+                    const column = ind % level.column;
+                    const row = Math.floor(ind / level.row);
+                    let count = getCount(row, column);
+                    count ===0?count = ' ':count
+                    item.innerHTML = count;
+                }
+              
+            })
 			setTimeout(() => {
 				location.reload();
 			}, 3000);
@@ -151,9 +164,7 @@ function startGame(level) {
 
 		finishGame();
 
-
 		const count = getCount(row, column);
-        console.log(count)
 		if (count !== 0 && !isBomb(row, column)) {
 			cell.innerHTML = count;
 			return;
@@ -167,7 +178,7 @@ function startGame(level) {
 	}
 
 	function isBomb(row, column) {
-		if (!isValid(row, column)) return;
+		if (!isDataValid(row, column)) return;
 		const index = row * level.row + column;
 
 		return bombs.includes(index);
@@ -183,5 +194,3 @@ function startGame(level) {
 		}
 	}
 }
-
-
