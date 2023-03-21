@@ -53,18 +53,25 @@ function startGame(level) {
 	board.innerHTML = `<button class = 'btn'></button>`.repeat(numberOfCells);
 	board.style.width = `${Math.sqrt(numberOfCells) * 40}px`;
 	const cells = [...board.children];
+    const bombs = []
 
 	let countCells = 0;
 
-	const bombs = [...Array(numberOfCells).keys()]
-		.sort(() => Math.random() - 0.5)
-		.slice(0, level.bomb);
+    
+    function randomBomb () {
+        for (let i=0; i<level.bomb; i++) {
+            let bomb= Math.floor(Math.random() * numberOfCells)
+            bombs.includes(bomb)?i--:bombs.push(bomb)
+        }
+        return bombs
+    }
+
+    randomBomb ();
 
 	function decreaseTime() {
 		timeEl.innerHTML = `Time ${time}s`;
 		if (time === 0) {
 			timeOver();
-			timeEl.innerHTML = `YOU LOSE`;
 		} else {
 			let current = --time;
 			timeEl.innerHTML = `Time ${current}s`;
@@ -109,9 +116,6 @@ function startGame(level) {
 	});
 
 	function isValid(row, column) {
-		console.log(
-			row >= 0 && row < level.row && column >= 0 && column < level.column
-		);
 		return row >= 0 && row < level.row && column >= 0 && column < level.column;
 	}
 
@@ -147,7 +151,9 @@ function startGame(level) {
 
 		finishGame();
 
+
 		const count = getCount(row, column);
+        console.log(count)
 		if (count !== 0 && !isBomb(row, column)) {
 			cell.innerHTML = count;
 			return;
@@ -156,8 +162,6 @@ function startGame(level) {
 		for (let x = -1; x <= 1; x++) {
 			for (let y = -1; y <= 1; y++) {
 				openCell(row + x, column + y);
-				console.log(row + x);
-				console.log(column + y);
 			}
 		}
 	}
@@ -179,3 +183,5 @@ function startGame(level) {
 		}
 	}
 }
+
+
